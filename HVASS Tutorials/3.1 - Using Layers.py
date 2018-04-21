@@ -1,7 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from scipy import misc
-from PIL import Image
 import math
 from skimage import color
 from skimage import io
@@ -75,58 +73,47 @@ logits = net        # Sometimes output of last layer is called the logits
 y_pred = tf.nn.softmax(logits=logits)
 y_pred_cls = tf.argmax(y_pred, axis=1)
 
-def rec_label(label):
-    label = int(label)
-    if label == 0:
-        return [1,0,0,0,0,0,0,0,0,0]
-    if label == 1:
-        return [0,1,0,0,0,0,0,0,0,0]
-    if label == 2:
-        return [0,0,1,0,0,0,0,0,0,0]
-    if label == 3:
-        return [0,0,0,1,0,0,0,0,0,0]
-    if label == 4:
-        return [0,0,0,0,1,0,0,0,0,0]
-    if label == 5:
-        return [0,0,0,0,0,1,0,0,0,0]
-    if label == 6:
-        return [0,0,0,0,0,0,1,0,0,0]
-    if label == 7:
-        return [0,0,0,0,0,0,0,1,0,0]
-    if label == 8:
-        return [0,0,0,0,0,0,0,0,1,0]
-    if label == 9:
-        return [0,0,0,0,0,0,0,0,0,1]
-
-def rgb2gray(rgb):
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 def use_model(input_data, label):
+    """
+    Method that handles creating a TF Session and getting the results
+    of the computation
+    Prints it in a human readable array
+    :param input_data: the Tensor to input as the input data for the model
+    :param label: needed, though unnecessary label input
+    :return: None
+    """
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
     saver = tf.train.Saver()
     saver.restore(sess, '/tmp/model.ckpt')
-    print("Succesfully restored ", sess)
+    print("Successfully restored ", sess)
     with tf.device("/gpu:0"):
         result = sess.run(y_pred, feed_dict={x: input_data, y_true: label})
-        highest_index = 0
-        highest = 0
-        i = 0
-        for value in result[0]:
-            if value > highest:
-                highest = value
-                highest_index = i
-            i+=1
+        index = np.argmax(result)
+        result = [0 for _ in range(10)]
+        result[index] = 1
         print(result)
-        print(highest_index)
     sess.close()
 
 
-def sigmoid(x):
-    return 1 / (1 + math.exp(-x))
+def sigmoid(num):
+    """
+    Simple sigmoid function that squishes down input into a number between 0 and 1
+    :param num: number to apply the function
+    :return: result of sigmoid function
+    """
+    return 1 / (1 + math.exp(-num))
+
 
 def main():
+    """
+    Main method of the program that handles pre-processing the images data
+    in order to feed it into the model correct
+    Continues until user inputs the exit
+    :return: None
+    """
     sentinel = True
     while sentinel:
         filename = input("Input file name to check ('q' to quit): ")
@@ -142,7 +129,7 @@ def main():
             else:
                 img[0][i] = sigmoid(value)
             i+=1
-        label = [[0,0,0,0,0,0,0,0,0,1]]
+        label = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
         use_model(img, label)
 
 if __name__ == '__main__':
