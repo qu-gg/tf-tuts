@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-import math
 from tensorflow.examples.tutorials.mnist import input_data
 device = "/gpu:0"
 

@@ -23,7 +23,7 @@ Layers API Convolutional Net Implementation
 """
 net = x_image       # refers to the previous layer
 
-### FIRST CONV LAYER
+""" FIRST CONV LAYER"""
 # Input: input image
 # Filter: 16 filters with size
 # Kernal: 5x5
@@ -35,7 +35,7 @@ net = tf.layers.conv2d(inputs=net, name='layer_conv1', padding='same',
 net = tf.layers.max_pooling2d(inputs=net, pool_size=2, strides=2)
 
 
-### SECOND CONV LAYER
+"""" SECOND CONV LAYER """""
 # Input: output from first conv layer
 # Filter: 36 filters
 # Filter kernel size: 5x5
@@ -51,7 +51,7 @@ net = tf.layers.max_pooling2d(inputs=net, pool_size=2, strides=2)
 net = tf.layers.flatten(net)
 
 
-### FULLY CONNECTED LAYER
+""" FULLY CONNECTED LAYER """
 # Input: output from flatten conv layer 2
 # Units: number of neurons in the layer
 # ReLU: True
@@ -59,7 +59,7 @@ net = tf.layers.dense(inputs=net, name='layer_fc1',
                       units=128, activation=tf.nn.relu)
 
 
-### FINAL CONNECTED LAYER
+"""FINAL CONNECTED LAYER """
 # Input: output from first fc layer
 # Units: 10 neurons, for each digit
 # ReLU: False because we just need the raw output
@@ -95,6 +95,7 @@ def use_model(input_data, label):
         result = [0 for _ in range(10)]
         result[index] = 1
         print(result)
+        print(np.argmax(result))
     sess.close()
 
 
